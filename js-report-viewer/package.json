@@ -1,0 +1,12 @@
+{
+  "name": "js-report-viewer",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@types/jquery": "^3.3.31",
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1",
+    "popper": "^1.0.1"
+  },
+  "devDependencies": {}
+}
