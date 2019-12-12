@@ -2,12 +2,19 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>JS Report Viewer...</title> 
+        <script type="text/javascript" src="./mockData/credmo.genericObject.mock.js"></script>
         <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="js-report-viewer.js"></script>
+
+        <style type="text/css">
+            .name-header {
+                font-weight: bold;
+            }
+        </style>
     </head>
 
     <body>
-        <div id="reportViewer" data-include-bootstrap="true" class="container text-center"></div>
+        <div id="reportViewer" data-include-bootstrap="true" data-report-service-url='' data-report-object="mockReportDataObject" data-mock-data="false" class="container"></div>
     </bod>
 
     <script>
