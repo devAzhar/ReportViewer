@@ -1,6 +1,6 @@
 const showCreditReport = (divId: string, options: any) => {
     const windowObject: any = window;
-alert(1);
+
     enum Constants {
         jQueryPath = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
         bootstrapJSPath = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js',
