@@ -1,6 +1,6 @@
-const showCreditReport = (divId: string, reportBody: any, options: any) => {
+const showCreditReport = (divId: string, options: any) => {
     const windowObject: any = window;
-
+alert(1);
     enum Constants {
         jQueryPath = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
         bootstrapJSPath = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js',
@@ -98,10 +98,13 @@ const showCreditReport = (divId: string, reportBody: any, options: any) => {
             const reportObject: any = options && options.reportObject ? options.reportObject : $div.data('report-object');
             
             if (mockData) {
-                $.get(Constants.mockDataPath).then(data => resolve(data)).catch(error => reject(error));
+                console.log(`Loading Mock Data`);
+                $.get(Constants.mockDataPath).then(data => resolve(data)).fail(error => reject(error));
             } else if (reportServiceUrl) {
-                $.get(reportServiceUrl).then(data => resolve(data)).catch(error => reject(error));
+                console.log(`Loading ${reportServiceUrl}`);
+                $.get(reportServiceUrl).then(data => resolve(data)).fail(error => reject(error));
             } else if (reportObject) {
+                console.log(`Loading reportObject`);
                 resolve(eval(reportObject));
             } else {
                 reject('Could not load generic report object. Please check the data configuration.');
@@ -261,28 +264,31 @@ const showCreditReport = (divId: string, reportBody: any, options: any) => {
                 `;
                 
                 $div.find('.content').html($reportHtml);
+                resolve({'success': true});
             })
             .catch(error => {
                 showErrorMessage(error);
                 reject(error);
                 return;
             });
-
-            resolve({'success': true});
         });
     };
 
     const $jq = windowObject.jQuery;
 
-    loadJavaScript(!$jq && Constants.jQueryPath)
-    .then(script => {
-        if(!$jq) {
-            const $ = windowObject.jQuery;
-        }
+    try{
+        loadJavaScript(!$jq && Constants.jQueryPath)
+        .then(script => {
+            if(!$jq) {
+                const $ = windowObject.jQuery;
+            }
 
-        initializeReportViewer().catch(error => {console.error(error)});
-    })
-    .catch(error => {
-        console.error(error);
-    });
+            initializeReportViewer().catch(error => {console.error(error)});
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    } catch (e) {
+        console.log(e);          
+    }
 };

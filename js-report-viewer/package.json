@@ -1,12 +1,23 @@
 {
   "name": "js-report-viewer",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@types/jquery": "^3.3.31",
+    "@hapi/inert": "^5.2.2",
+    "@types/jquery": "^1.9.0",
     "bootstrap": "^4.4.1",
-    "jquery": "^3.4.1",
-    "popper": "^1.0.1"
+    "hapi": "^18.1.0",
+    "jquery": "^1.9.0",
+    "popper.js": "^1.16.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"tsc --watch\" \"node .\\index.js\" ",
+    "start1": "\"node .\\index.js\" ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
