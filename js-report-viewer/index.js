@@ -1,15 +1,15 @@
 'use strict';
 
 const Hapi = require('hapi');
-const Path = require('path');
 const Inert = require('@hapi/inert');
 
 const init = async () => {
-    console.log("Hello");
+    const HOST_NAME = `localhost`;
+    const PORT = 3003;
 
     const server = Hapi.server({
-        port: 3000,
-        host: 'localhost'
+        port: PORT,
+        host: HOST_NAME
     });
 
     await server.register(Inert);
@@ -54,7 +54,7 @@ const init = async () => {
     });
 
     await server.start();
-    console.log('Server running on %s', server.info.uri);
+    console.log(`Server running on ${server.info.uri}`);
 };
 
 process.on('unhandledRejection', (err) => {
