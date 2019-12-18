@@ -1,150 +1,156 @@
 // IFFI
 (() => {
-    const $widgetID = `genericReport${Math.random()}`.replace(`.`, ``);
-    let jsonPCallBack = `displayGenericReport`;
-    const jsonPScriptId = `#genericReportViewer`;
-    const options = null;
-
+    // TS Hack
     const windowObject: any = window;
 
-    const Bureaus = {
-        'tui': 'Transunion',
-        'efx': 'Equifax',
-        'exp': 'Experian'
+    const Globals = {
+        Bureaus : {
+            'tui': 'Transunion',
+            'efx': 'Equifax',
+            'exp': 'Experian'
+        },
+        Constants: {
+            jQueryPath: 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
+            bootstrapJSPath: '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js',
+            bootstrapCSSPath: '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css',
+            mockDataPath: 'mockData/credmo.genericObject.mock.json',
+            defaultCallBack: `displayGenericReport`,
+            jsonPScriptId: `#genericReportViewer`
+        },
+        WidgetID: () => `genericReport${Math.random()}`.replace(`.`, ``),
     };
 
-    const formatCurrency = (input, decPlaces?, decSep?, thouSep?, symbol?) => {
-        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-        decSep = typeof decSep === "undefined" ? "." : decSep;
-        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-        const sign = input < 0 ? "-" : "";
-        const i = String(parseInt(input = Math.abs(Number(input) || 0).toFixed(decPlaces)));
-        var j = (j = i.length) > 3 ? j % 3 : 0;
+    const CommonFunction = {
+        loadJavaScript: (src: string, parentTagName?: string) => {
+            if(!parentTagName) {
+                parentTagName = 'head';
+            }
+    
+            const parentTagObject: any = document.getElementsByTagName(parentTagName);
+    
+            return new Promise((resolve, reject) => {
+                if(!src) {
+                    resolve();
+                    return;
+                }
+                console.log(`Loading Java-script ${src}`);
+    
+                if(!parentTagObject) {
+                    reject(`Parent tag not found.`);
+                    return;
+                }
+    
+                try {
+                    const script: any = document.createElement('SCRIPT');
+                    script.src = src;
+                    script.type = 'text/javascript';
+    
+                    script.onload = function() {
+                        resolve(script);
+                    };
+                    
+                    parentTagObject[0].appendChild(script);
+                } catch(e) {
+                    reject(e);
+                }
+            });
+        },
+        formatCurrency: (input, decPlaces?, decSep?, thouSep?, symbol?) => {
+            decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+            decSep = typeof decSep === "undefined" ? "." : decSep;
+            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+            const sign = input < 0 ? "-" : "";
+            const i = String(parseInt(input = Math.abs(Number(input) || 0).toFixed(decPlaces)));
+            var j = (j = i.length) > 3 ? j % 3 : 0;
+            
+            const numberValue = parseInt(i);
         
-        const numberValue = parseInt(i);
+            if (!symbol) {
+                symbol = '$';
+            }
+        
+            return symbol + sign +
+                (j ? i.substr(0, j) + thouSep : "") +
+                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+                (decPlaces ? decSep + Math.abs(input - numberValue).toFixed(decPlaces).slice(2) : "");
+        },
+        loadCSS: (src: string, parentTagName?: string) => {
+            if(!parentTagName) {
+                parentTagName = 'head';
+            }
     
-        if (!symbol) {
-            symbol = '$';
-        }
+            const parentTagObject: any = document.getElementsByTagName(parentTagName);
     
-        return symbol + sign +
-            (j ? i.substr(0, j) + thouSep : "") +
-            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-            (decPlaces ? decSep + Math.abs(input - numberValue).toFixed(decPlaces).slice(2) : "");
-    };
-   
-    enum Constants {
-        jQueryPath = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
-        bootstrapJSPath = '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js',
-        bootstrapCSSPath = '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css',
-        mockDataPath = 'mockData/credmo.genericObject.mock.json'
-    }
-
-    const loadJavaScript = (src: string, parentTagName?: string) => {
-        if(!parentTagName) {
-            parentTagName = 'head';
-        }
-
-        const parentTagObject: any = document.getElementsByTagName(parentTagName);
-
-        return new Promise((resolve, reject) => {
-            if(!src) {
-                resolve();
-                return;
-            }
-            console.log(`Loading Java-script ${src}`);
-
-            if(!parentTagObject) {
-                reject(`Parent tag not found.`);
-                return;
-            }
-
-            try {
-                const script: any = document.createElement('SCRIPT');
-                script.src = src;
-                script.type = 'text/javascript';
-
-                script.onload = function() {
-                    resolve(script);
-                };
-                
-                parentTagObject[0].appendChild(script);
-            } catch(e) {
-                reject(e);
-            }
-        });
-    };
+            return new Promise((resolve, reject) => {
+                if(!src) {
+                    resolve();
+                    return;
+                }
     
-    const loadCSS = (src: string, parentTagName?: string) => {
-        if(!parentTagName) {
-            parentTagName = 'head';
-        }
-
-        const parentTagObject: any = document.getElementsByTagName(parentTagName);
-
-        return new Promise((resolve, reject) => {
-            if(!src) {
-                resolve();
-                return;
-            }
-
-            console.log(`Loading CSS ${src}`);
-
-            if(!parentTagObject) {
-                reject(`Parent tag not found.`);
-                return;
-            }
-
-            try {
-                const head: any = parentTagObject[0];
-                const link: any = document.createElement('link');
-                link.rel  = 'stylesheet';
-                link.type = 'text/css';
-                link.href = src;
-                link.media = 'all';
-                head.appendChild(link);
-                
-                resolve(src);
-            } catch(e) {
-                reject(e);
-            }
-        });
-    };
-
-    const showErrorMessage = (error: any) => {
-        const $jq = windowObject.jQuery;
-        const $div = $jq(`#${$widgetID}`);
-
-        console.error(error);
-        $div.find('.error').removeClass('hidden').find('.error-content').html(error);
-        $div.find('.content').hide();
-    };
-
-    const getGenericReportObject = () => {
-        return new Promise((resolve, reject) => {
+                console.log(`Loading CSS ${src}`);
+    
+                if(!parentTagObject) {
+                    reject(`Parent tag not found.`);
+                    return;
+                }
+    
+                try {
+                    const head: any = parentTagObject[0];
+                    const link: any = document.createElement('link');
+                    link.rel  = 'stylesheet';
+                    link.type = 'text/css';
+                    link.href = src;
+                    link.media = 'all';
+                    head.appendChild(link);
+                    
+                    resolve(src);
+                } catch(e) {
+                    reject(e);
+                }
+            });
+        },
+        showErrorMessage: (error: any) => {
             const $jq = windowObject.jQuery;
-            const $jsonPScriptTag = $jq(jsonPScriptId);
-
-            const mockData: boolean = options && options.mockData ? options.mockData : $jsonPScriptTag.data('mock-data');
-            const reportServiceUrl: string = options && options.reportServiceUrl ? options.reportServiceUrl : $jsonPScriptTag.data('report-service-url');
-            const reportObject: any = options && options.reportObject ? options.reportObject : $jsonPScriptTag.data('report-object');
-
-            if (mockData) {
-                console.log(`Loading Mock Data`);
-                $.get(Constants.mockDataPath).then(data => resolve(data)).fail(error => reject(error));
-            } else if (reportServiceUrl) {
-                console.log(`Loading ${reportServiceUrl}`);
-                $.get(reportServiceUrl).then(data => resolve(data)).fail(error => reject(error));
-            } else if (reportObject) {
-                console.log(`Loading reportObject`);
-                resolve(eval(reportObject));
-            } else {
-                reject('Could not load generic report object. Please check the data configuration.');
-            }
-        });
+    
+            $jq(document).ready(() => {
+                const $div = $jq(`#${$widgetID}`);
+                $div.find('.error').removeClass('hidden').find('.error-content').html(error);
+                $div.find('.content').hide();
+                console.error(error);
+            });
+        }, getGenericReportObject: () => {
+            return new Promise((resolve, reject) => {
+                const $jq = windowObject.jQuery;
+                const $jsonPScriptTag = $jq(jsonPScriptId);
+    
+                const mockData: boolean = options && options.mockData ? options.mockData : $jsonPScriptTag.data('mock-data');
+                const reportServiceUrl: string = options && options.reportServiceUrl ? options.reportServiceUrl : $jsonPScriptTag.data('report-service-url');
+                const reportObject: any = options && options.reportObject ? options.reportObject : $jsonPScriptTag.data('report-object');
+    
+                if (mockData) {
+                    console.log(`Loading Mock Data`);
+                    $.get(Globals.Constants.mockDataPath).then(data => resolve(data)).fail(error => reject(error));
+                } else if (reportServiceUrl) {
+                    console.log(`Loading ${reportServiceUrl}`);
+                    $.get(reportServiceUrl).then(data => resolve(data)).fail(error => reject(error));
+                } else if (reportObject) {
+                    console.log(`Loading reportObject`);
+                    resolve(eval(reportObject));
+                } else {
+                    reject('Could not load generic report object. Please check the data configuration.');
+                }
+            });
+        }, 
+        maskSSN: ssn => 'xxx-xx-' + ssn.substring(ssn.length-4)
     }
 
-    const maskSSN = (ssn: string) => 'xxx-xx-' + ssn.substring(ssn.length-4);
+    let jsonPCallBack = Globals.Constants.defaultCallBack;
+
+    // TODO: No Options for now, will remove this later
+     const options = null;
+    // TODO -> Remove the depandancy on jsonPScriptId
+    const jsonPScriptId = Globals.Constants.jsonPScriptId;
+    const $widgetID = Globals.WidgetID();
 
     const displayReportViewer = (reportObject: any) => {
         const $jq = windowObject.jQuery;
@@ -240,20 +246,20 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Balance</h5>
-                        <p class="card-text">${formatCurrency(reportData.summary.tradelineSummary.totalBalances)}</p>
+                        <p class="card-text">${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalBalances)}</p>
                         <p class="card-text"><small class="text-muted"></small></p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Monthly Payments</h5>
-                        <p class="card-text">${formatCurrency(reportData.summary.tradelineSummary.totalMonthlyPayments)}</p>
+                        <p class="card-text">${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalMonthlyPayments)}</p>
                         <p class="card-text"><small class="text-muted"></small></p>
                     </div>
                 </div>
             </div>`;
 
-        const bureauName = Bureaus[reportData.bureau]?Bureaus[reportData.bureau]:reportData.bureau;
+        const bureauName = Globals.Bureaus[reportData.bureau]?Globals.Bureaus[reportData.bureau]:reportData.bureau;
 
         $reportHtml += `<div class='row'>
             <div class='col-md-12'>
@@ -269,7 +275,7 @@
                             </div>
                             <div class='col-md-6'>
                                 <div>Date of Birth: ${reportData.demographicData.dateOfBirth}</div>
-                                <div>SSN: ${maskSSN(reportData.demographicData.SSN)}</div>
+                                <div>SSN: ${CommonFunction.maskSSN(reportData.demographicData.SSN)}</div>
                             </div>
                         </div>
                     </div>
@@ -317,8 +323,8 @@
             const containerClass = options && options.containerClass ? options.containerClass : $jsonPScriptTag.data('container-class');
 
             if(includeBootstrap) {
-                loadCSS(Constants.bootstrapCSSPath)
-                .then(script => loadJavaScript(Constants.bootstrapJSPath))
+                CommonFunction.loadCSS(Globals.Constants.bootstrapCSSPath)
+                .then(script => CommonFunction.loadJavaScript(Globals.Constants.bootstrapJSPath))
                 .then(script => {})
                 .catch(error => {});
             };
@@ -338,12 +344,15 @@
                 </div>
             `;
             
-            getGenericReportObject().then((reportObject: any) => {
+            CommonFunction.getGenericReportObject().then((reportObject: any) => {
+                // If we get the generic report object, we need to return the HTML;
                 resolve($html);
+                
+                // Now set the content of the inner DIV based on generic object
                 displayReportViewer(reportObject);
             })
             .catch(error => {
-                showErrorMessage(error);
+                CommonFunction.showErrorMessage(error);
                 reject(error);
                 return;
             });
@@ -354,7 +363,8 @@
     // Load pre-requisites and then initialize the report viewer
     try{
         const $jq = windowObject.jQuery;
-        loadJavaScript(!$jq && Constants.jQueryPath)
+        
+        CommonFunction.loadJavaScript(!$jq && Globals.Constants.jQueryPath)
         .then(() => {
             initializeReportViewer()
             .then(reportHtml => eval(`${jsonPCallBack}(reportHtml)`))
