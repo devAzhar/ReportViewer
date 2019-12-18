@@ -79,7 +79,7 @@ const showCreditReport = (divId: string, options: any) => {
         });
     };
 
-    const showErrorMessage = error => {
+    const showErrorMessage = (error: any) => {
         const $jq = windowObject.jQuery;
         const $div = $jq(divId);
 
@@ -157,7 +157,7 @@ const showCreditReport = (divId: string, options: any) => {
 
             getGenericReportObject().then((reportObject: any) => {
                 console.log(reportObject)
-                const reportData = reportObject.data.reportData;
+                const reportData = reportObject.reportData;
 
                 console.log(reportData.bureauFulfillmentKey);
                 console.log(reportData.bureau);
