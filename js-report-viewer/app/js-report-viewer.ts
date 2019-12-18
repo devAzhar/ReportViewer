@@ -1,10 +1,42 @@
-const showCreditReport = (divId: string, options: any) => {
+// IFFI
+(() => {
+    const $widgetID = `genericReport${Math.random()}`.replace(`.`, ``);
+    let jsonPCallBack = `displayGenericReport`;
+    const jsonPScriptId = `#genericReportViewer`;
+    const options = null;
+
     const windowObject: any = window;
 
+    const Bureaus = {
+        'tui': 'Transunion',
+        'efx': 'Equifax',
+        'exp': 'Experian'
+    };
+
+    const formatCurrency = (input, decPlaces?, decSep?, thouSep?, symbol?) => {
+        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+        decSep = typeof decSep === "undefined" ? "." : decSep;
+        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+        const sign = input < 0 ? "-" : "";
+        const i = String(parseInt(input = Math.abs(Number(input) || 0).toFixed(decPlaces)));
+        var j = (j = i.length) > 3 ? j % 3 : 0;
+        
+        const numberValue = parseInt(i);
+    
+        if (!symbol) {
+            symbol = '$';
+        }
+    
+        return symbol + sign +
+            (j ? i.substr(0, j) + thouSep : "") +
+            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+            (decPlaces ? decSep + Math.abs(input - numberValue).toFixed(decPlaces).slice(2) : "");
+    };
+   
     enum Constants {
         jQueryPath = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
-        bootstrapJSPath = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js',
-        bootstrapCSSPath = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css',
+        bootstrapJSPath = '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js',
+        bootstrapCSSPath = '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css',
         mockDataPath = 'mockData/credmo.genericObject.mock.json'
     }
 
@@ -81,7 +113,7 @@ const showCreditReport = (divId: string, options: any) => {
 
     const showErrorMessage = (error: any) => {
         const $jq = windowObject.jQuery;
-        const $div = $jq(divId);
+        const $div = $jq(`#${$widgetID}`);
 
         console.error(error);
         $div.find('.error').removeClass('hidden').find('.error-content').html(error);
@@ -91,12 +123,12 @@ const showCreditReport = (divId: string, options: any) => {
     const getGenericReportObject = () => {
         return new Promise((resolve, reject) => {
             const $jq = windowObject.jQuery;
-            const $div = $jq(divId);
+            const $jsonPScriptTag = $jq(jsonPScriptId);
 
-            const mockData: boolean = options && options.mockData ? options.mockData : $div.data('mock-data');
-            const reportServiceUrl: string = options && options.reportServiceUrl ? options.reportServiceUrl : $div.data('report-service-url');
-            const reportObject: any = options && options.reportObject ? options.reportObject : $div.data('report-object');
-            
+            const mockData: boolean = options && options.mockData ? options.mockData : $jsonPScriptTag.data('mock-data');
+            const reportServiceUrl: string = options && options.reportServiceUrl ? options.reportServiceUrl : $jsonPScriptTag.data('report-service-url');
+            const reportObject: any = options && options.reportObject ? options.reportObject : $jsonPScriptTag.data('report-object');
+
             if (mockData) {
                 console.log(`Loading Mock Data`);
                 $.get(Constants.mockDataPath).then(data => resolve(data)).fail(error => reject(error));
@@ -114,6 +146,156 @@ const showCreditReport = (divId: string, options: any) => {
 
     const maskSSN = (ssn: string) => 'xxx-xx-' + ssn.substring(ssn.length-4);
 
+    const displayReportViewer = (reportObject: any) => {
+        const $jq = windowObject.jQuery;
+        const reportData = reportObject.reportData;
+
+        console.log(reportData.bureauFulfillmentKey);
+        console.log(reportData.bureau);
+
+        let $reportHtml: string = '';
+        let $previousAddresses: string = '';
+        let $summary: string = '';
+        let $scoreSummary: string = '';
+        let $inquiries: string = '';
+
+        if (reportData.demographicData.previousAddresses) {
+            $previousAddresses += `
+            <div class="card-body previous-addresses">
+                <div class='card-title'><h5>Previous Addresses:</h5></div>
+                <ul class="list-group">
+                `;
+                reportData.demographicData.previousAddresses.forEach(address => {
+                    $previousAddresses += `
+                    <li class="list-group-item">
+                        ${address.address1}, ${address.city}, ${address.state} ${address.zip} 
+                    </li>`;
+                });
+                
+                $previousAddresses += `</ul>
+            </div>
+            `;
+        }
+
+        const cardsContainerType = `card-deck`; //card-deck, card-group, card-columns
+        $summary += `
+        <div class="${cardsContainerType} card-body">
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.tradelineSummary.totalAccounts}</strong> Total Accounts
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.tradelineSummary.openAccounts}</strong> Open Accounts
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.tradelineSummary.closeAccounts}</strong> Closed Accounts
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.tradelineSummary.derogatoryAccounts}</strong> Derogatory Accounts
+                </div>
+            </div>
+        </div>
+        <div class="${cardsContainerType} card-body">
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.tradelineSummary.delinquentAccounts}</strong> Delinquent Accounts
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.inquirySummary.numberInLast2Years}</strong> Total Inquiries Count
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <strong>${reportData.summary.publicRecordSummary.numberOfRecords}</strong> Total Public Records
+                </div>
+            </div>
+            <div class="card" style='border: none;'></div>
+        </div>
+        `;
+        
+        $scoreSummary = `
+            <div class="${cardsContainerType} card-body">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Credit Score</h5>
+                        <p class="card-text">${reportData.creditScore.riskScore}</p>
+                        <p class="card-text"><small class="text-muted">${reportData.creditScore.scoreName}</small></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Score Rank</h5>
+                        <p class="card-text">${reportData.creditScore.populationRank}</p>
+                        <p class="card-text"><small class="text-muted"></small></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Balance</h5>
+                        <p class="card-text">${formatCurrency(reportData.summary.tradelineSummary.totalBalances)}</p>
+                        <p class="card-text"><small class="text-muted"></small></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Monthly Payments</h5>
+                        <p class="card-text">${formatCurrency(reportData.summary.tradelineSummary.totalMonthlyPayments)}</p>
+                        <p class="card-text"><small class="text-muted"></small></p>
+                    </div>
+                </div>
+            </div>`;
+
+        const bureauName = Bureaus[reportData.bureau]?Bureaus[reportData.bureau]:reportData.bureau;
+
+        $reportHtml += `<div class='row'>
+            <div class='col-md-12'>
+                <div class="card">
+                    <div class="card-header name-header text-center">${bureauName} Report</div>
+                    <div class="card-body">
+                        <h5 class="card-title">${reportData.demographicData.name.first} ${reportData.demographicData.name.middle} ${reportData.demographicData.name.last}</h5>
+                        
+                        <div class='row'>
+                            <div class='col-md-6'>
+                                <div>${reportData.demographicData.address.address1}</div>
+                                <div>${reportData.demographicData.address.city}, ${reportData.demographicData.address.state} ${reportData.demographicData.address.zip}</div>
+                            </div>
+                            <div class='col-md-6'>
+                                <div>Date of Birth: ${reportData.demographicData.dateOfBirth}</div>
+                                <div>SSN: ${maskSSN(reportData.demographicData.SSN)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${$previousAddresses}
+
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            ${$scoreSummary}
+                            ${$summary}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        // Set the data once the DOM is loaded.
+        $jq(document).ready(() => {
+            setTimeout(() => {
+                const $div = $jq(`#${$widgetID}`);
+                $div.find('.content').html($reportHtml);
+            }, 0);
+        });
+    };
+
     const initializeReportViewer = () => {
         return new Promise((resolve, reject) => {
             const $jq = windowObject.jQuery;
@@ -122,149 +304,43 @@ const showCreditReport = (divId: string, options: any) => {
                 reject(`jQuery is not available...`);
                 return;
             }
-            const $div = $jq(divId);
 
-            if(!$div || $div.length === 0) {
-                reject(`Element not found ${divId}...`);
+            const $jsonPScriptTag = $jq(jsonPScriptId);
+            jsonPCallBack = options && options.reportObject ? options.reportObject : $jsonPScriptTag.data('callback');
+
+            if(!$jsonPScriptTag || $jsonPScriptTag.length === 0) {
+                reject(`Element not found #${$widgetID}...`);
                 return;
             }
 
-            const includeBootstrap: boolean = options && options.includeBootstrap ? options.includeBootstrap : $div.data('include-bootstrap');
-            const containerClass = options && options.containerClass ? options.containerClass : $div.data('container-class');
-
-            containerClass && $div.addClass(containerClass);
+            const includeBootstrap: boolean = options && options.includeBootstrap ? options.includeBootstrap : $jsonPScriptTag.data('include-bootstrap');
+            const containerClass = options && options.containerClass ? options.containerClass : $jsonPScriptTag.data('container-class');
 
             if(includeBootstrap) {
-                $div.hide();
                 loadCSS(Constants.bootstrapCSSPath)
                 .then(script => loadJavaScript(Constants.bootstrapJSPath))
-                .then(script => $div.show())
-                .catch(error => $div.show());
+                .then(script => {})
+                .catch(error => {});
             };
         
             let $html = `
-                <div class='row hidden error'>
-                    <div class='col-md-12 error-content'>
+                <div id='${$widgetID}' class='${containerClass}'>
+                    <div class='row hidden error'>
+                        <div class='col-md-12 error-content'>
+                        </div>
                     </div>
-                </div>
-                <div class='content'>
-                    <div class='text-center'>
-                        Loading report viewer...
+                    <div class='content container'>
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
-            $div.html($html);
-
+            
             getGenericReportObject().then((reportObject: any) => {
-                console.log(reportObject)
-                const reportData = reportObject.reportData;
-
-                console.log(reportData.bureauFulfillmentKey);
-                console.log(reportData.bureau);
-
-                let $reportHtml: string = '';
-                let $previousAddresses: string = '';
-                let $summary: string = '';
-                let $scoreSummary: string = '';
-                let $inquiries: string = '';
-
-                if (reportData.demographicData.previousAddresses) {
-                    $previousAddresses += `
-                    <div class='previous-addresses'>
-                        <div class='address-header previous-address-header'>
-                            Previous Addresses:
-                        </div>`;
-                        reportData.demographicData.previousAddresses.forEach(address => {
-                            $previousAddresses += `
-                            <div class='address-header previous-address'>
-                                ${address.address1} ${address.city} ${address.state} ${address.zip} 
-                            </div>`;
-                        });
-                        
-                        $previousAddresses += `
-                    </div>`;
-                }
-
-                $summary += `
-                <div class='summary'>
-                    <div class='row'>
-                        <div class='summary-header col-md-12'>
-                            Credit Report Summary
-                        </div>
-                    </div>                
-                    <div class='row'>
-                        <div class='col-md-3'>Monthly Payments</div>
-                        <div class='col-md-3'>Balances</div>
-                        <div class='col-md-3'>Derogatory Accounts</div>
-                        <div class='col-md-3'>Delinquent Accounts</div>
-                    </div>                
-                    <div class='row'>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.totalMonthlyPayments}</div>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.totalBalances}</div>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.derogatoryAccounts}</div>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.delinquentAccounts}</div>
-                    </div>                
-                    <div class='row'>
-                        <div class='col-md-3'>Close Accounts</div>
-                        <div class='col-md-3'>Open Accounts</div>
-                        <div class='col-md-3'>Total Accounts</div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.closeAccounts}</div>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.openAccounts}</div>
-                        <div class='col-md-3'>${reportData.summary.tradelineSummary.totalAccounts}</div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-md-3'>Total Inquiries</div>
-                        <div class='col-md-3'>Total Public Records</div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-md-3'>${reportData.summary.inquirySummary.numberInLast2Years}</div>
-                        <div class='col-md-3'>${reportData.summary.publicRecordSummary.numberOfRecords}</div>
-                    </div>
-                </div>
-                `;
-
-                $scoreSummary = `
-                <div class='score-summary'>
-                    <div class='row'>
-                        <div class='col-md-3'>Score</div>
-                        <div class='col-md-3'>Type</div>
-                        <div class='col-md-3'>Rank</div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-md-3'>${reportData.creditScore.riskScore}</div>
-                        <div class='col-md-3'>${reportData.creditScore.scoreName}</div>
-                        <div class='col-md-3'>${reportData.creditScore.populationRank}</div>
-                    </div>
-                </div>
-                `;
-                
-                $reportHtml += `<div class='row'>
-                    <div class='col-md-12'>
-                        <div class='name-header'>
-                            Credit Report for ${reportData.demographicData.name.first} ${reportData.demographicData.name.middle} ${reportData.demographicData.name.last}
-                        </div>
-                        <div class='ssn-header'>
-                            SSN: ${maskSSN(reportData.demographicData.SSN)}
-                        </div>
-                        <div class='dob-header'>
-                            Date of Birth: ${reportData.demographicData.dateOfBirth}
-                        </div>
-                        <div class='address-header'>
-                            Address: ${reportData.demographicData.address.address1} ${reportData.demographicData.address.city} ${reportData.demographicData.address.state} ${reportData.demographicData.address.zip} 
-                        </div>
-                        ${$previousAddresses}
-                    </div>
-                </div>
-                
-                ${$summary}
-                ${$scoreSummary}
-                ${$inquiries}
-                `;
-                
-                $div.find('.content').html($reportHtml);
-                resolve({'success': true});
+                resolve($html);
+                displayReportViewer(reportObject);
             })
             .catch(error => {
                 showErrorMessage(error);
@@ -274,21 +350,20 @@ const showCreditReport = (divId: string, options: any) => {
         });
     };
 
-    const $jq = windowObject.jQuery;
-
+    // Start point
+    // Load pre-requisites and then initialize the report viewer
     try{
+        const $jq = windowObject.jQuery;
         loadJavaScript(!$jq && Constants.jQueryPath)
-        .then(script => {
-            if(!$jq) {
-                const $ = windowObject.jQuery;
-            }
-
-            initializeReportViewer().catch(error => {console.error(error)});
+        .then(() => {
+            initializeReportViewer()
+            .then(reportHtml => eval(`${jsonPCallBack}(reportHtml)`))
+            .catch(error => console.error(error));
         })
         .catch(error => {
             console.error(error);
         });
     } catch (e) {
-        console.log(e);          
+        console.error(e);          
     }
-};
+})();
