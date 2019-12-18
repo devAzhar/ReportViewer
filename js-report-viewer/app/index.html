@@ -4,14 +4,17 @@
         <title>JS Report Viewer...</title> 
         <script type="text/javascript" src="./mockData/credmo.genericObject.mock.js"></script>
         <!-- <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script> -->
-
         <style type="text/css">
             .name-header {
                 font-weight: bold;
             }
         </style>
 
-        <script type="text/javascript">
+        <script type="text/javascript">           
+            function handler(d) {
+                console.log(d);
+            }
+
             function displayGenericReport2(reportHTML)
             {
                 console.log(reportHTML);
@@ -22,7 +25,8 @@
                 }
             }
         </script>
-        <script id='genericReportViewer' type="text/javascript" src="js-report-viewer.js?d=1" data-include-bootstrap="true" data-report-service-url='mockData/credmo.genericObject.mock.json' data-report-object="" data-mock-data="false" data-callback='displayGenericReport2'></script>
+        <!-- <script type="text/javascript" src="/jsonp/_health?display=displayGenericReport2"></script> -->
+        <script id='genericReportViewer' type="text/javascript" src="js-report-viewer.js" data-include-bootstrap="true" data-report-service-url='mockData/credmo.genericObject.mock.json' data-report-object="" data-mock-data="false" data-callback='displayGenericReport2'></script>
     </head>
 
     <body>
