@@ -18,6 +18,7 @@
             jsonPScriptId: `#genericReportViewer`
         },
         WidgetID: () => `genericReport${Math.random()}`.replace(`.`, ``),
+        FakeDelay: 1000
     };
 
     const CommonFunction = {
@@ -57,9 +58,9 @@
         },
         formatCurrency: (input, decPlaces?, decSep?, thouSep?, symbol?) => {
             decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-            decSep = typeof decSep === "undefined" ? "." : decSep;
-            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-            const sign = input < 0 ? "-" : "";
+            decSep = typeof decSep === 'undefined' ? '.' : decSep;
+            thouSep = typeof thouSep === 'undefined' ? ',' : thouSep;
+            const sign = input < 0 ? '-' : '';
             const i = String(parseInt(input = Math.abs(Number(input) || 0).toFixed(decPlaces)));
             var j = (j = i.length) > 3 ? j % 3 : 0;
             
@@ -70,9 +71,9 @@
             }
         
             return symbol + sign +
-                (j ? i.substr(0, j) + thouSep : "") +
-                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-                (decPlaces ? decSep + Math.abs(input - numberValue).toFixed(decPlaces).slice(2) : "");
+                (j ? i.substr(0, j) + thouSep : '') +
+                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, '$1' + thouSep) +
+                (decPlaces ? decSep + Math.abs(input - numberValue).toFixed(decPlaces).slice(2) : '');
         },
         loadCSS: (src: string, parentTagName?: string) => {
             if(!parentTagName) {
@@ -164,16 +165,89 @@
         let $summary: string = '';
         let $scoreSummary: string = '';
         let $inquiries: string = '';
+        let $tradeLines: string = '';
 
-        if (reportData.demographicData.previousAddresses) {
+        $tradeLines = `
+            <div class='card-title'><h5>Accounts:</h5></div>
+            <table class='table table-striped table-bordered table-responsive-lg'>
+                <thead>
+                    <tr>
+                        <th scope='col'>Date</th>
+                        <th scope='col'>Account Number</th>
+                        <th scope='col'>Creditor</th>
+                        <th scope='col'>Status</th>
+                        <th scope='col'>Balance</th>
+                        <th scope='col'>Type</th>
+                        <th scope='col'>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (reportData.tradeLineItems && reportData.tradeLineItems.forEach) {
+            reportData.tradeLineItems.forEach(tradeLineItem => {
+                const info = tradeLineItem.info;
+                $tradeLines += `
+                <tr>
+                    <td>${info.dateReported}</td>
+                    <td>${info.accountNumber}</td>
+                    <td>${info.creditorName}-${info.subscriberCode}</td>
+                    <td>${info.openClosed.abbreviation}</td>
+                    <td>${CommonFunction.formatCurrency(info.currentBalance)}</td>
+                    <td>${tradeLineItem.accountType.abbreviation}</td>
+                    <td>${info.source.reference}</td>
+                </tr>
+                `;
+            });
+        }
+
+        $tradeLines +=
+        `
+                </tbody>
+            </table>
+        `;
+
+        $inquiries = `
+            <div class='card-title'><h5>Inquiries:</h5></div>
+
+            <table class='table table-striped table-bordered table-responsive-md'>
+                <thead>
+                    <tr>
+                        <th scope='col'>Inquiry Date</th>
+                        <th scope='col'>Subscriber</th>
+                        <th scope='col'>Type</th>
+                        <th scope='col'>Reference</th>
+                    </tr>
+                </thead>
+            <tbody>
+        `;
+
+        if (reportData.inquiries && reportData.inquiries.forEach) {
+            reportData.inquiries.forEach(inquiry => {
+                $inquiries += `
+                <tr>
+                    <td>${inquiry.inquiryDate}</td>
+                    <td>${inquiry.subscriberName}-${inquiry.subscriberNumber}</td>
+                    <td>${inquiry.inquiryType}</td>
+                    <td>${inquiry.reference}</td>
+                </tr>
+                `;
+            });
+        }
+
+        $inquiries += `
+                </tbody>
+            </table>
+        `
+        if (reportData.demographicData.previousAddresses && reportData.demographicData.previousAddresses.forEach) {
             $previousAddresses += `
-            <div class="card-body previous-addresses">
+            <div class='card-body previous-addresses'>
                 <div class='card-title'><h5>Previous Addresses:</h5></div>
-                <ul class="list-group">
+                <ul class='list-group'>
                 `;
                 reportData.demographicData.previousAddresses.forEach(address => {
                     $previousAddresses += `
-                    <li class="list-group-item">
+                    <li class='list-group-item'>
                         ${address.address1}, ${address.city}, ${address.state} ${address.zip} 
                     </li>`;
                 });
@@ -185,76 +259,76 @@
 
         const cardsContainerType = `card-deck`; //card-deck, card-group, card-columns
         $summary += `
-        <div class="${cardsContainerType} card-body">
-            <div class="card">
-                <div class="card-body">
+        <div class='${cardsContainerType} card-body'>
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.tradelineSummary.totalAccounts}</strong> Total Accounts
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.tradelineSummary.openAccounts}</strong> Open Accounts
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.tradelineSummary.closeAccounts}</strong> Closed Accounts
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.tradelineSummary.derogatoryAccounts}</strong> Derogatory Accounts
                 </div>
             </div>
         </div>
-        <div class="${cardsContainerType} card-body">
-            <div class="card">
-                <div class="card-body">
+        <div class='${cardsContainerType} card-body'>
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.tradelineSummary.delinquentAccounts}</strong> Delinquent Accounts
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.inquirySummary.numberInLast2Years}</strong> Total Inquiries Count
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
+            <div class='card'>
+                <div class='card-body'>
                     <strong>${reportData.summary.publicRecordSummary.numberOfRecords}</strong> Total Public Records
                 </div>
             </div>
-            <div class="card" style='border: none;'></div>
+            <div class='card' style='border: none;'></div>
         </div>
         `;
         
         $scoreSummary = `
-            <div class="${cardsContainerType} card-body">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Credit Score</h5>
-                        <p class="card-text">${reportData.creditScore.riskScore}</p>
-                        <p class="card-text"><small class="text-muted">${reportData.creditScore.scoreName}</small></p>
+            <div class='${cardsContainerType} card-body'>
+                <div class='card'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>Credit Score</h5>
+                        <p class='card-text'>${reportData.creditScore.riskScore}</p>
+                        <p class='card-text'><small class='text-muted'>${reportData.creditScore.scoreName}</small></p>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Score Rank</h5>
-                        <p class="card-text">${reportData.creditScore.populationRank}</p>
-                        <p class="card-text"><small class="text-muted"></small></p>
+                <div class='card'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>Score Rank</h5>
+                        <p class='card-text'>${reportData.creditScore.populationRank}</p>
+                        <p class='card-text'><small class='text-muted'></small></p>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Balance</h5>
-                        <p class="card-text">${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalBalances)}</p>
-                        <p class="card-text"><small class="text-muted"></small></p>
+                <div class='card'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>Balance</h5>
+                        <p class='card-text'>${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalBalances)}</p>
+                        <p class='card-text'><small class='text-muted'></small></p>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Monthly Payments</h5>
-                        <p class="card-text">${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalMonthlyPayments)}</p>
-                        <p class="card-text"><small class="text-muted"></small></p>
+                <div class='card'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>Monthly Payments</h5>
+                        <p class='card-text'>${CommonFunction.formatCurrency(reportData.summary.tradelineSummary.totalMonthlyPayments)}</p>
+                        <p class='card-text'><small class='text-muted'></small></p>
                     </div>
                 </div>
             </div>`;
@@ -263,10 +337,10 @@
 
         $reportHtml += `<div class='row'>
             <div class='col-md-12'>
-                <div class="card">
-                    <div class="card-header name-header text-center">${bureauName} Report</div>
-                    <div class="card-body">
-                        <h5 class="card-title">${reportData.demographicData.name.first} ${reportData.demographicData.name.middle} ${reportData.demographicData.name.last}</h5>
+                <div class='card'>
+                    <div class='card-header name-header text-center'>${bureauName} Report</div>
+                    <div class='card-body'>
+                        <h5 class='card-title'>${reportData.demographicData.name.first} ${reportData.demographicData.name.middle} ${reportData.demographicData.name.last}</h5>
                         
                         <div class='row'>
                             <div class='col-md-6'>
@@ -288,6 +362,22 @@
                             ${$summary}
                         </div>
                     </div>
+
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <div class='card-body'>
+                                ${$inquiries}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <div class='card-body'>
+                                ${$tradeLines}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -298,7 +388,7 @@
             setTimeout(() => {
                 const $div = $jq(`#${$widgetID}`);
                 $div.find('.content').html($reportHtml);
-            }, 0);
+            }, Globals.FakeDelay);
         });
     };
 
@@ -336,9 +426,9 @@
                         </div>
                     </div>
                     <div class='content container'>
-                        <div class="text-center">
-                            <div class="spinner-border" role="status">
-                            </div>
+                        <div class='text-center'>
+                            <div class='spinner-border' style='width: 3rem; height: 3rem;' role='status'></div>
+                            <div class='spinner-grow' style='width: 3rem; height: 3rem;' role='status'></div>
                         </div>
                     </div>
                 </div>
