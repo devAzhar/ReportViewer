@@ -25,6 +25,8 @@ RUN npm install
 # Copy the project source code into the container
 COPY src/ .
 
+RUN npm run build
+
 # Document expected port (EXPOSE is for documentation only)
 EXPOSE 3003
 

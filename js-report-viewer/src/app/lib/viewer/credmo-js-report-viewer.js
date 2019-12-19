@@ -1,7 +1,8 @@
-(function() {
+(() => {
   console.log('credmo-js-report-viewer 1.2...');
 
   const getDocument = () => eval('document');
+  const getScriptObject = () => getDocument().getElementById(Globals.Constants.scriptTagId);
   const getWindow = () => eval('window');
   const maskSSN = ssn => 'xxx-xx-' + ssn.substring(ssn.length - 4);
   const loadJavaScript = src => (!src ? '' : `<script async src='${src}' type='text/javascript'></script>`);
@@ -52,13 +53,13 @@
     return returnValue;
   };
 
+  const scriptObject = getScriptObject();
+
   const validate = () => {
     let result = false;
     let msg = '';
 
-    const scriptTagObject = getDocument().getElementById(Globals.Constants.scriptTagId);
-
-    if (scriptTagObject) {
+    if (scriptObject) {
       result = true;
     } else {
       msg = `Could not find script tag ${Globals.Constants.scriptTagId}`;
@@ -69,11 +70,13 @@
         console.error(msg);
       }
     } else {
-      console.log(`Validated good 1.2...`);
+      console.log(`Validated good 1.3...`);
     }
 
     return result;
   };
 
-  validate();
+  if (!validate()) {
+    return;
+  }
 })();
