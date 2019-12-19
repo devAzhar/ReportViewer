@@ -24,10 +24,19 @@ const init = async () => {
 
   server.route({
     method: 'GET',
-    path: '/api/report-viewer/v1/js-report-viewer',
+    path: '/api/report-viewer/v1/credmo-jsonp-report-viewer',
     options: {
       jsonp: 'display',
       handler: jsReportViewer
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/api/report-viewer/v1/credmo-js-report-viewer',
+    handler: (request, h) => {
+      request;
+      return h.file('dist/lib/viewer/credmo-js-report-viewer.js');
     }
   });
 
@@ -37,6 +46,15 @@ const init = async () => {
     handler: (request, h) => {
       request;
       return h.file('app/html/index.html');
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/js',
+    handler: (request, h) => {
+      request;
+      return h.file('app/html/index-js.html');
     }
   });
 

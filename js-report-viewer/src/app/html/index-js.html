@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>JS Report Viewer - JSONP...</title> 
+        <title>JS Report Viewer - JS...</title> 
         <link href='//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet' type='text/css' media='all' />
 
         <style type="text/css">
@@ -9,19 +9,6 @@
                 font-weight: bold;
             }
         </style>
-
-        <script type="text/javascript">           
-            function displayGenericReport(response) {
-                console.log(response);
-                reportHTML = response.html;
-
-                var $div = document.getElementById("reportViewer");
-
-                if ($div && reportHTML) {
-                    $div.innerHTML = reportHTML;
-                }
-            }
-        </script>
    </head>
 
     <body>
@@ -34,6 +21,6 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="/api/report-viewer/v1/credmo-jsonp-report-viewer?display=displayGenericReport&includeBootstrap=false&displayToken=1&mock=1"></script>
+        <script id="credmoJSReportViewer" type="text/javascript" src="/api/report-viewer/v1/credmo-js-report-viewer"></script>
     </bod>
 </html>

@@ -4,7 +4,7 @@
     "sourceType": "module",
     "ecmaVersion": 2018
   },
-  "ignorePatterns": ["*mock*", "node_modules/", "*.json", "*.ts"],
+  "ignorePatterns": ["*mock*", "node_modules/", "*.json", "*.ts", "dist/*.*"],
   "rules": {
     "prettier/prettier": ["error"],
     "semi": ["error", "always"],
