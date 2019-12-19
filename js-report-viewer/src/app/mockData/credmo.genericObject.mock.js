@@ -1,4 +1,4 @@
-mockReportDataObject = {
+export const mockReportDataObject = {
     "reportData": {
         "bureau": "tui",
         "bureauFulfillmentKey": "tui-bureauFulfillmentKey-sample",
@@ -189,12 +189,7 @@ mockReportDataObject = {
                         "symbol": "Y",
                         "rank": "199"
                     },
-                    "openClosed": {
-                        "abbreviation": "Open",
-                        "description": "Open",
-                        "symbol": "O",
-                        "rank": "199"
-                    },
+                    "openClosed": {},
                     "payStatus": {
                         "abbreviation": "Coll/Chargeoff",
                         "description": "Collection/Chargeoff",

@@ -1,122 +1,22 @@
-const getDocument = () => eval('document');
-const getWindow = () => eval('window');
+export const getDocument = () => eval('document');
+export const getWindow = () => eval('window');
+export const maskSSN = ssn => 'xxx-xx-' + ssn.substring(ssn.length - 4);
+export const loadJavaScript = src => (!src ? '' : `<script async src='${src}' type='text/javascript'></script>`);
+export const loadCSS = src => (!src ? '' : `<link href='${src}' rel='stylesheet' type='text/css' media='all' />`);
 
 export const Globals = {
   Bureaus: { tui: 'Transunion', efx: 'Equifax', exp: 'Experian' },
   Constants: {
-    jQueryPath: 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
     bootstrapJSPath: '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js',
-    bootstrapCSSPath: '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css',
-    mockDataPath: 'mockData/credmo.genericObject.mock.json',
-    defaultCallBack: 'displayGenericReport',
-    jsonPScriptId: '#genericReportViewer'
+    bootstrapCSSPath: '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'
   },
-  WidgetID: () => `genericReport${Math.random()}`.replace('.', ''),
+  _WidgetID: '',
+  WidgetID: () => (Globals._WidgetID ? Globals._WidgetID : (Globals._WidgetID = `genericReport${Math.random()}`.replace('.', ''))),
   FakeDelay: 1000
 };
 
-export const maskSSN = ssn => 'xxx-xx-' + ssn.substring(ssn.length - 4);
-
-export const getGenericReportObject = jsonPScriptId => {
-  return new Promise((resolve, reject) => {
-    const $jq = getWindow().jQuery;
-    const $jsonPScriptTag = $jq(jsonPScriptId);
-
-    const mockData = $jsonPScriptTag.data('mock-data');
-    const reportServiceUrl = $jsonPScriptTag.data('report-service-url');
-    const reportObject = $jsonPScriptTag.data('report-object');
-
-    if (mockData) {
-      console.log(`Loading Mock Data`);
-      $jq
-        .get(Globals.Constants.mockDataPath)
-        .then(data => resolve(data))
-        .fail(error => reject(error));
-    } else if (reportServiceUrl) {
-      console.log(`Loading ${reportServiceUrl}`);
-      $jq
-        .get(reportServiceUrl)
-        .then(data => resolve(data))
-        .fail(error => reject(error));
-    } else if (reportObject) {
-      console.log(`Loading reportObject`);
-      resolve(eval(reportObject));
-    } else {
-      reject('Could not load generic report object. Please check the data configuration.');
-    }
-  });
-};
-
-export const loadJavaScript = (src, parentTagName) => {
-  if (!parentTagName) {
-    parentTagName = 'head';
-  }
-
-  const parentTagObject = getDocument().getElementsByTagName(parentTagName);
-
-  return new Promise((resolve, reject) => {
-    if (!src) {
-      resolve();
-      return;
-    }
-
-    console.log(`Loading Java-script ${src}`);
-
-    if (!parentTagObject) {
-      reject(`Parent tag not found.`);
-      return;
-    }
-
-    try {
-      const script = getDocument().createElement('SCRIPT');
-      script.src = src;
-      script.type = 'text/javascript';
-
-      script.onload = function() {
-        resolve(script);
-      };
-
-      parentTagObject[0].appendChild(script);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
-
-export const loadCSS = (src, parentTagName) => {
-  if (!parentTagName) {
-    parentTagName = 'head';
-  }
-
-  const parentTagObject = getDocument().getElementsByTagName(parentTagName);
-
-  return new Promise((resolve, reject) => {
-    if (!src) {
-      resolve();
-      return;
-    }
-
-    console.log(`Loading CSS ${src}`);
-
-    if (!parentTagObject) {
-      reject(`Parent tag not found.`);
-      return;
-    }
-
-    try {
-      const head = parentTagObject[0];
-      const link = getDocument().createElement('link');
-      link.rel = 'stylesheet';
-      link.type = 'text/css';
-      link.href = src;
-      link.media = 'all';
-      head.appendChild(link);
-
-      resolve(src);
-    } catch (e) {
-      reject(e);
-    }
-  });
+export const getGenericReportObject = async displayToken => {
+  throw new Error(`getGenericReportObject not implemented yet. ${displayToken}`);
 };
 
 export const formatCurrency = (input, decPlaces, decSep, thouSep, symbol) => {

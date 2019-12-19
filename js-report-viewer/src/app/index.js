@@ -22,19 +22,12 @@ const init = async () => {
     }
   });
 
-  // server.route({
-  //   method: 'GET',
-  //   path: '/api/report-viewer/v1/js-report-viewer/{bureauFulfillmentKey?}',
-  //   handler: jsReportViewer
-  // });
-
-  //like https://spin.credmo.systemadmin.com/api/enterprise/tui/browser?displayToken=12345&display=displayMethod&includeBootstrap=true
   server.route({
     method: 'GET',
     path: '/api/report-viewer/v1/js-report-viewer',
     options: {
-        jsonp: 'display',
-        handler: jsReportViewer
+      jsonp: 'display',
+      handler: jsReportViewer
     }
   });
 
