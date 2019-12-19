@@ -409,6 +409,7 @@
                 return;
             }
 
+            const includejQuery: boolean = options && options.includejQuery ? options.includejQuery : $jsonPScriptTag.data('include-jquery');
             const includeBootstrap: boolean = options && options.includeBootstrap ? options.includeBootstrap : $jsonPScriptTag.data('include-bootstrap');
             const containerClass = options && options.containerClass ? options.containerClass : $jsonPScriptTag.data('container-class');
 
