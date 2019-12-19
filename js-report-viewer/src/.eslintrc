@@ -1,0 +1,28 @@
+{
+  "plugins": ["import", "prettier"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2018
+  },
+  "ignorePatterns": ["*mock*", "node_modules/"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "semi": ["error", "always"],
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "comma-dangle": ["error", "only-multiline"],
+    "import/no-unresolved": 0,
+    "no-console": 0,
+    "object-curly-newline": [
+      "error",
+      {
+        "ExportDeclaration": { "multiline": true, "minProperties": 5 }
+      }
+    ],
+    "no-unused-vars": [2, { "args": "all", "argsIgnorePattern": "^_" }]
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "prettier"]
+}

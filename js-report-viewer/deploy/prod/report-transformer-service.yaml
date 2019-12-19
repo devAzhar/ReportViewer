@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: js-report-viewer
+spec:
+  selector:
+    app: js-report-viewer
+  type: NodePort
+  ports:
+    - protocol: TCP
+      name: port3003
+      port: 3003
+      targetPort: 3003

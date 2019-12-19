@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  js-report-viewer:
+    container_name: js-report-viewer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - '3003:3003'

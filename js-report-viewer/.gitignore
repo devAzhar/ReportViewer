@@ -1,0 +1,51 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+package-lock.json
+
+# compiled output
+dist/
+/angular/dist
+/tmp
+angular/tmp
+/out-tsc
+angular/out-tsc
+
+# dependencies
+node_modules/
+angular/node_modules
+angular/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+.env
+/.sass-cache
+angular/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+angular/npm-debug.log
+yarn-error.log
+testem.log
+/typings
+angular/typings
+.nyc_output/
+
+# System Files
+.DS_Store
+Thumbs.db

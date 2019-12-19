@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: js-report-viewer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: js-report-viewer
+  template:
+    metadata:
+      labels:
+        app: js-report-viewer
+    spec:
+      containers:
+        - name: js-report-viewer
+          image: us.gcr.io/gke-credmo-1/js-report-viewer:latest
+          ports:
+            - containerPort: 3003
+          readinessProbe:
+            httpGet:
+              path: /_health
+              port: 3003
+          livenessProbe:
+            tcpSocket:
+              port: 3003
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: LOG_LEVEL
+              value: "debug"
