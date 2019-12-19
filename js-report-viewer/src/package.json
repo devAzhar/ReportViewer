@@ -1,7 +1,7 @@
 {
   "name": "js-report-viewer",
   "version": "1.0.0",
-  "description": "NodeJS service that transforms TUI/EXP/EFX/MergedTUI/MergedCredmo JSON credit reports to a generic Credmo JSON credit report for use in frontends.",
+  "description": "Report Viewer.",
   "main": "app/index.js",
   "scripts": {
     "build": "babel app -d dist",

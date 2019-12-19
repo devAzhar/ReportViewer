@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { mockReportDataObject } from '../mockData/credmo.genericObject.mock';
 import { getGenericReportObject, Globals } from '../lib/utils/index';
 
-import { reportViewer } from '../lib/viewer/jsReportViewer';
+import { reportViewer } from '../lib/viewer/jsonpReportViewer';
 
 export const jsReportViewer = async (request, reply) => {
   request.log(`debug`, `jsReportViewer`);
