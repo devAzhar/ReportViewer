@@ -471,8 +471,8 @@
     const $jq = jQ();
     const script = $jq(getScriptObject());
 
-    const includeBootstrap = script.data('credmo-includeBootstrap');
-    const includeBootstrapJs = script.data('credmo-includeBootstrapJs');
+    const includeBootstrap = script.data('credmo-includebootstrap');
+    const includeBootstrapJs = script.data('credmo-includebootstrapJs');
     const callBackFunctionName = script.data('credmo-render-function');
     const returnReportHtml = script.data('credmo-report-get-html') || !callBackFunctionName;
     const $divRef = script.data('credmo-render-element');
