@@ -208,7 +208,7 @@
     const tradeLineItems = get(reportData, 'tradeLineItems', null);
     const inquiries = get(reportData, 'inquiries', null);
     const previousAddresses = get(reportData, 'demographicData.previousAddresses', null);
-  
+
     let $previousAddresses = '';
     let $summary = '';
     let $scoreSummary = '';
@@ -389,21 +389,21 @@
         `;
       });
     }
-  
+
     $inquiries += `
           </tbody>
         </table>
       </div>`;
 
-      const bureauName = Globals.Bureaus[reportData.bureau] ? Globals.Bureaus[reportData.bureau] : reportData.bureau;
-      const firstName = get(reportData, 'demographicData.name.first', '');
-      const middleName = get(reportData, 'demographicData.name.middle', '');
-      const lastName = get(reportData, 'demographicData.name.last', '');
-      const city = get(reportData, 'demographicData.address.city', '');
-      const state = get(reportData, 'demographicData.address.state', '');
-      const zip = get(reportData, 'demographicData.address.zip', '');
+    const bureauName = Globals.Bureaus[reportData.bureau] ? Globals.Bureaus[reportData.bureau] : reportData.bureau;
+    const firstName = get(reportData, 'demographicData.name.first', '');
+    const middleName = get(reportData, 'demographicData.name.middle', '');
+    const lastName = get(reportData, 'demographicData.name.last', '');
+    const city = get(reportData, 'demographicData.address.city', '');
+    const state = get(reportData, 'demographicData.address.state', '');
+    const zip = get(reportData, 'demographicData.address.zip', '');
 
-      $reportHtml += `<div class='row'>
+    $reportHtml += `<div class='row'>
       <div class='col-md-12'>
         <div class='card'>
           <div class='card-header name-header text-center'>${bureauName} Report</div>
@@ -459,8 +459,7 @@
     <div class='content container'>
     ${$reportHtml}
     </div>
-  </div>
-  `;    
+  </div>`;
     return $reportHtml;
   };
 
@@ -468,15 +467,24 @@
     reportData = reportData.reportData ? reportData.reportData : reportData;
     reportData = reportData.reportData ? reportData.reportData : reportData;
     console.log(`Render Report`);
-    console.log(reportData);
 
     const $jq = jQ();
     const script = $jq(getScriptObject());
 
+    const includeBootstrap = script.data('credmo-includeBootstrap');
+    const includeBootstrapJs = script.data('credmo-includeBootstrapJs');
     const callBackFunctionName = script.data('credmo-render-function');
     const returnReportHtml = script.data('credmo-report-get-html') || !callBackFunctionName;
     const $divRef = script.data('credmo-render-element');
     const $div = $jq($divRef);
+
+    if (includeBootstrap) {
+      loadCSS(Globals.Constants.bootstrapCSSPath);
+    }
+
+    if (includeBootstrapJs) {
+      loadJavaScript(Globals.Constants.bootstrapJSPath);
+    }
 
     let $reportHTML = '';
 
