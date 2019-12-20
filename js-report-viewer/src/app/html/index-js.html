@@ -3,13 +3,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>JS Report Viewer - JS...</title> 
         <link href='//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet' type='text/css' media='all' />
+        <script type="text/javascript" src="mockData/credmo.genericObject.mock.simple.js"></script>
 
         <style type="text/css">
             .name-header {
                 font-weight: bold;
             }
         </style>
-   </head>
+        
+        <script type="text/javascript">
+            function renderFunction(reportData, html) {
+                console.log('Customer Based Rendering. renderFunction');
+                console.log(reportData);
+                console.log(html);
+            }
+        </script>
+    </head>
 
     <body>
         <br />
@@ -22,12 +31,14 @@
         </div>
 
         <script id="credmoJSReportViewer" type="text/javascript" src="/api/report-viewer/v1/credmo-js-report-viewer"
-            data-credmo-render-element="consumerReport"
-            data-credmo-tui-displaytoken="D5492774-9199-40CB-B7E5-2388C2B35C8C" 
-            data-credmo-render-function=""
-            data-credmo-report-object=""
+            data-credmo-render-element="#consumerReport"
+            data-credmo-exp-displaytoken="D5492774-9199-40CB-B7E5-2388C2B35C8C" 
+            data-credmo-report-object="mockReportDataObject"
             data-credmo-includeBootstrap="true"
+
+            data-credmo-render-function=""
             data-credmo-includejQuery="true"
+            data-credmo-report-get-html="true"
         ></script>
     </bod>
 </html>
